@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="wrap">
+        <h1>Wanikani progress wallpaper</h1>
+        <form action="/generate" method="post" class="generate-form">
+            <input type="text" name="api_key" placeholder="paste your api key here">
+            <input type="submit" value="generate!">
+        </form>
+
+        <div class="footer">
+            Based on code by <a href="https://github.com/akranis/wanikaniwallpaper">akranis</a>,
+            inspired by <a href="http://www.wanikani.com/chat/api-and-third-party-apps/1565">this thread</a>.
+        </div>
+    </div>
+{% endblock %}
