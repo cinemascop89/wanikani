@@ -35,15 +35,15 @@ def generate_grid(user_progress, dimensions):
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype("ipag.ttf", font_size, encoding='utf-8')
 
-    y = 0
-
+    x, y = 0, 0
     for i, kanji in enumerate(grid.kanji):
-        if i % (image_width / font_size) == 0:
-            y += font_size
-        position = ((i % (image_width / font_size)) * font_size, (i * font_size / image_width) * font_size)
         color = colors[user_table.get(kanji, 'locked')]
+        draw.text((x, y), kanji, font=font, fill=color)
 
-        draw.text(position, kanji, font=font, fill=color)
+        x += font_size
+        if x > image_width:
+            x = 0
+            y += font_size
 
     return image
 
