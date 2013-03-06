@@ -4,8 +4,15 @@
     <div class="wrap">
         <h1>Wanikani progress wallpaper</h1>
         <form action="/generate" method="post" class="generate-form">
-            <input type="text" name="api_key" placeholder="paste your api key here">
-            <input type="submit" value="generate!">
+            <p>
+                <input type="text" name="api_key" placeholder="paste your api key here">
+                <input type="submit" value="generate!">
+            </p>
+            <p>
+                Wallpaper dimensions:
+                <input class="resolution" type="text" name="width"> X
+                <input class="resolution" type="text" name="height">
+            </p>
         </form>
 
         <div class="footer">
@@ -13,4 +20,11 @@
             inspired by <a target="_blank" href="http://www.wanikani.com/chat/api-and-third-party-apps/1565">this thread</a>.
         </div>
     </div>
+
+    <script type="text/javascript">
+    $(function(){
+        $("input[name=width]").val(screen.width);
+        $("input[name=height]").val(screen.height);
+    });
+    </script>
 {% endblock %}

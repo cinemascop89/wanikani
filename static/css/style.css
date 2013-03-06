@@ -18,6 +18,13 @@ body {
     width: 600px;
 }
 
+.generate-form input.resolution {
+    width: 100px;
+    height: 30px;
+    text-align: center;
+}
+
+
 .generate-form input[type=submit] {
     font-family: 'Helvetica', 'Arial', sans-serif;
     font-size: 24px;

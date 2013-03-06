@@ -17,8 +17,9 @@ def generate():
     api_key = request.form['api_key']
     client = Wanikani(api_key)
     user_progress = client.kanji()
+    dimensions = (int(request.form['width']), int(request.form['height']))
 
-    image = generate_grid(user_progress['requested_information'])
+    image = generate_grid(user_progress['requested_information'], dimensions)
     image_io = StringIO()
     image.save(image_io, 'PNG')
     response = make_response(image_io.getvalue())

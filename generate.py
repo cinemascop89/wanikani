@@ -4,7 +4,6 @@ import math
 from PIL import Image, ImageFont, ImageDraw
 
 import grid
-WALLPAPER_SIZE = (1366, 768)
 
 
 def generate_user_table(user_progress):
@@ -17,7 +16,7 @@ def generate_user_table(user_progress):
 
     return table
 
-def generate_grid(user_progress):
+def generate_grid(user_progress, dimensions):
 
     colors = {
         'apprentice':0xDD0093,
@@ -29,10 +28,10 @@ def generate_grid(user_progress):
     }
 
     user_table = generate_user_table(user_progress)
-    image_width, image_height = WALLPAPER_SIZE
+    image_width, image_height = dimensions
     font_size = int(math.sqrt(image_width * image_height / len(grid.kanji)))
 
-    image = Image.new("RGB", WALLPAPER_SIZE)
+    image = Image.new("RGB", dimensions)
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype("ipag.ttf", font_size, encoding='utf-8')
 
@@ -41,7 +40,7 @@ def generate_grid(user_progress):
     for i, kanji in enumerate(grid.kanji):
         if i % (image_width / font_size) == 0:
             y += font_size
-        position = (i * font_size % (image_width - 2), (i * font_size / image_width) * font_size)
+        position = ((i % (image_width / font_size)) * font_size, (i * font_size / image_width) * font_size)
         color = colors[user_table.get(kanji, 'locked')]
 
         draw.text(position, kanji, font=font, fill=color)
