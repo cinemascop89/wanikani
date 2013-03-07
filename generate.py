@@ -41,7 +41,7 @@ def generate_grid(user_progress, dimensions):
         draw.text((x, y), kanji, font=font, fill=color)
 
         x += font_size
-        if x > image_width:
+        if x >= image_width - font_size:
             x = 0
             y += font_size
 
