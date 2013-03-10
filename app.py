@@ -1,31 +1,37 @@
-from StringIO import StringIO
+import os
+import hashlib
 
-from flask import Flask, render_template, request, make_response
+from flask import Flask, render_template, request, jsonify, make_response
+from boto.s3.bucket import Bucket
+from boto.s3.connection import S3Connection
 
-from api import Wanikani
 from generate import generate_grid
+import settings
 
 app = Flask(__name__)
-app.debug = True
+app.debug = settings.DEBUG
 
 @app.route('/')
 def hello_world():
     return render_template('home.html')
 
+
 @app.route('/generate', methods=['POST'])
 def generate():
     api_key = request.form['api_key']
-    client = Wanikani(api_key)
-    user_progress = client.kanji()
-    dimensions = (int(request.form['width']), int(request.form['height']))
+    poll = request.form["poll"]
 
-    image = generate_grid(user_progress['requested_information'], dimensions)
-    image_io = StringIO()
-    image.save(image_io, 'PNG')
-    response = make_response(image_io.getvalue())
-    response.content_type = 'image/png'
+    image_path = "images/{0}.png".format(hashlib.md5(api_key).hexdigest())
+    conn = S3Connection(settings.S3_ACCESS_KEY, settings.S3_SECRET_KEY)
+    bucket = Bucket(conn, settings.S3_BUCKET)
+    if bucket.get_key(image_path):
+        return jsonify({'status': 'ok', 'path': image_path})
+    else:
+        if poll == "false":
+            dimensions = (int(request.form['width']), int(request.form['height']))
+            generate_grid.delay(api_key, dimensions)
+        return jsonify({'status': 'generating'})
 
-    return response
 
 if __name__ == '__main__':
     app.run()

@@ -1,2 +1,4 @@
 www:
     type: python
+worker:
+    type: python-worker

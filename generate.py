@@ -1,9 +1,19 @@
 # -*- coding: utf-8 -*-
 import math
+import hashlib
+from cStringIO import StringIO
 
 from PIL import Image, ImageFont, ImageDraw
+from celery import Celery
+from boto.s3.bucket import Bucket
+from boto.s3.connection import S3Connection
+from boto.s3.key import Key
 
 import grid
+import settings
+from api import Wanikani
+
+celery = Celery('tasks', broker=settings.CELERY_BROKER_URL)
 
 
 def generate_user_table(user_progress):
@@ -16,7 +26,13 @@ def generate_user_table(user_progress):
 
     return table
 
-def generate_grid(user_progress, dimensions):
+
+@celery.task(ignore_result=True)
+def generate_grid(api_key, dimensions):
+
+    client = Wanikani(api_key)
+    user_progress = client.kanji()['requested_information']
+    print "User information received"
 
     colors = {
         'apprentice':0xDD0093,
@@ -45,5 +61,15 @@ def generate_grid(user_progress, dimensions):
             x = 0
             y += font_size
 
-    return image
+    image_io = StringIO()
+    image.save(image_io, format="PNG")
+
+    conn = S3Connection(settings.S3_ACCESS_KEY, settings.S3_SECRET_KEY)
+    bucket = Bucket(conn, settings.S3_BUCKET)
+    key = Key(bucket)
+    key.key = "images/{0}.png".format(hashlib.md5(api_key).hexdigest())
+    key.set_contents_from_string(image_io.getvalue())
+    key.set_acl('public-read')
+    key.set_metadata('Content-Type', 'image/png')
+
 

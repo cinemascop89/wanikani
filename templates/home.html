@@ -15,6 +15,11 @@
             </p>
         </form>
 
+        <div class="image-container">
+            <img src="" alt="">
+            <p>Right-click and Save as.. to save it</p>
+        </div>
+
         <div class="footer">
             Based on code by <a target="_blank" href="https://github.com/akranis/wanikaniwallpaper">akranis</a>,
             inspired by <a target="_blank" href="http://www.wanikani.com/chat/api-and-third-party-apps/1565">this thread</a>.
@@ -25,6 +30,37 @@
     $(function(){
         $("input[name=width]").val(screen.width);
         $("input[name=height]").val(screen.height);
+
+        var formData;
+
+
+        var pollGenerator = function(first) {
+            var data = first ? formData + "&poll=false" : formData + "&poll=true";
+            $.post("/generate",
+                    data,
+                    function(data){
+                        if (data['status'] == 'ok') {
+                            $(".image-container")
+                                    .show()
+                                    .find("img").attr("src", "https://s3.amazonaws.com/wanikani-wallpaper-generator/" + data["path"]);
+                        } else {
+                            setTimeout(pollGenerator, 3000);
+                        }
+                    },
+                    'json'
+            );
+        };
+
+        $("form").submit(function(e){
+
+            e.preventDefault();
+
+            var array = $(":input").serializeArray();
+            formData = $.param(array);
+            pollGenerator(true);
+
+            return false;
+        });
     });
     </script>
 {% endblock %}

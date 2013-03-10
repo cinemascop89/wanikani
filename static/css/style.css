@@ -35,6 +35,18 @@ body {
     height: 50px;
 }
 
+.image-container {
+    display: none;
+}
+
+.image-container img {
+    width: 100%;
+}
+
+.image-container p {
+    font-size: 10px;
+}
+
 .footer {
     font-style: italic;
     font-size: 10px;
