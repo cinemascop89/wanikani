@@ -1,9 +1,4 @@
-import os
-import hashlib
-
-from flask import Flask, render_template, request, jsonify, make_response
-from boto.s3.bucket import Bucket
-from boto.s3.connection import S3Connection
+from flask import Flask, render_template, request, jsonify
 
 from generate import generate_grid
 import settings
@@ -21,16 +16,10 @@ def generate():
     api_key = request.form['api_key']
     poll = request.form["poll"]
 
-    image_path = "images/{0}.png".format(hashlib.md5(api_key).hexdigest())
-    conn = S3Connection(settings.S3_ACCESS_KEY, settings.S3_SECRET_KEY)
-    bucket = Bucket(conn, settings.S3_BUCKET)
-    if bucket.get_key(image_path):
-        return jsonify({'status': 'ok', 'path': image_path})
-    else:
-        if poll == "false":
-            dimensions = (int(request.form['width']), int(request.form['height']))
-            generate_grid.delay(api_key, dimensions)
-        return jsonify({'status': 'generating'})
+    if poll == "false":
+        dimensions = (int(request.form['width']), int(request.form['height']))
+        generate_grid.delay(api_key, dimensions)
+    return jsonify({'status': 'generating'})
 
 
 if __name__ == '__main__':
