@@ -23,6 +23,7 @@ def generate():
     if poll == "false":
         dimensions = (int(request.form['width']), int(request.form['height']))
         generate_grid.delay(api_key, dimensions)
+        return jsonify({'status': 'generating'})
     else:
         image_path = "images/{0}.png".format(hashlib.md5(api_key).hexdigest())
         conn = S3Connection(settings.S3_ACCESS_KEY, settings.S3_SECRET_KEY)
